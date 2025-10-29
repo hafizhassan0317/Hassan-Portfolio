@@ -20,16 +20,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $mail = new PHPMailer(true);
     try {
-        // SMTP configuration
+        // ======================================================
+        // GMAIL SMTP CONFIGURATION (✅ fixed version)
+        // ======================================================
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
         $mail->Username   = 'bhaihassan278@gmail.com'; // your Gmail
-        $mail->Password   = 'syjd ciue lkwz xpqa';     // your App Password
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
+        $mail->Password   = 'syjdciuelkwzxpqa';        // Gmail App Password (no spaces)
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Use SSL (fixes timeout issue)
+        $mail->Port       = 465;                        // SSL port
 
-        // Sender and recipient
+        // Optional: increase timeout just in case
+        $mail->Timeout = 20;
+        $mail->SMTPKeepAlive = true;
+
+        // Sender & recipient
         $mail->setFrom('bhaihassan278@gmail.com', 'Portfolio Contact');
         $mail->addAddress('bhaihassan278@gmail.com');
         $mail->addReplyTo($email, $name);
@@ -52,11 +58,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
         ";
-
         $mail->AltBody = "New message from $name\n\nEmail: $email\nPhone: $phone\n\nMessage:\n$message";
 
+        // ======================================================
+        // SEND EMAIL
+        // ======================================================
         $mail->send();
         echo 'OK';
+
     } catch (Exception $e) {
         http_response_code(500);
         echo "Mailer Error: {$mail->ErrorInfo}";
